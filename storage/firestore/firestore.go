@@ -59,10 +59,11 @@ func (f *Firestore) Close() error {
 	return nil
 }
 
+// GetEvents retrieves all events for the batchSize which are not dispatched.
 func (f *Firestore) GetEvents(ctx context.Context, batchSize int32) ([]*outboxer.OutboxMessage, error) {
 	var events []*outboxer.OutboxMessage
 
-	docs := f.client.Collection(f.CollectionName).Where("dispatched", "==", false).Documents(ctx)
+	docs := f.client.Collection(f.CollectionName).Where("dispatched", "==", false).Limit(int(batchSize)).Documents(ctx)
 	for {
 		doc, err := docs.Next()
 		if err != nil {
